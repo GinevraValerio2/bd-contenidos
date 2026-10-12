@@ -27,7 +27,10 @@ Escribe una consulta que utilice un filtro para calcular simultáneamente el nú
 
 Solución:
 ```sql
-
+select 
+    round(avg(case when reproducciones > 100000000 then reproducciones end), 2) as media_exitos,
+    round(avg(case when reproducciones < 1000000 then reproducciones end), 2) as media_minoritarias
+from cancion;
 ```
 
 Resultado:
@@ -189,7 +192,27 @@ $FAMILIAR$(empleado, nombre, sexo, fechaNac, relación\*)
 
 Solución:
 ```sql
+CREATE TABLE FAMILIAR (
+    empleado TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    sexo TEXT NOT NULL,
+    fechaNac TEXT NOT NULL,
+    relacion TEXT NOT NULL,
+    PRIMARY KEY (empleado, relacion)
+);
 
+INSERT INTO FAMILIAR (empleado, nombre, sexo, fechaNac, relacion) VALUES
+(333445555, 'Alicia', 'F', '1986-04-06', 'Hija'),
+(333445555, 'Teodoro', 'M', '1983-10-25', 'Hijo'),
+(333445555, 'Luisa', 'F', '1958-05-03', 'Esposa'),
+(987654321, 'Alfonso', 'M', '1942-02-28', 'Esposo'),
+(123456789, 'Miguel', 'M', '1988-01-04', 'Hijo'),
+(123456789, 'Alice', 'F', '1988-12-30', 'Hija'),
+(123456789, 'Elisa', 'F', '1967-05-05', 'Esposa');
+
+SELECT *
+FROM FAMILIAR
+WHERE sexo = 'M';
 ```
 
 Tabla resultado:
@@ -247,7 +270,14 @@ Reescribe la definición de la tabla de `FAMILIAR` para agregar las siguientes r
 
 Solución
 ```sql
-
+CREATE TABLE FAMILIAR (
+    empleado TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    sexo TEXT NOT NULL CHECK (sexo IN ('F', 'M', 'O')),
+    fechaNac TEXT NOT NULL,
+    relacion TEXT NOT NULL CHECK (relacion IN ('Hijo/a', 'Conyuge', 'Hermano/a')),
+    PRIMARY KEY (empleado, relacion)
+);
 ```
 
 Para verificar tu respuesta, selecciona su definición de la tabla sqlite_schema mediante la siguiente consulta:
@@ -433,7 +463,18 @@ En caso de ser una sola columna, crea una restricción a nivel de columna.
 
 Solución:
 ```sql
-
+CREATE TABLE EMPLEADO (
+    nombre TEXT NOT NULL,
+    apellido1 TEXT NOT NULL,
+    apellido2 TEXT,
+    dni TEXT NOT NULL PRIMARY KEY,
+    fechaNac TEXT NOT NULL,
+    direccion TEXT NOT NULL,
+    sexo TEXT NOT NULL,
+    sueldo REAL NOT NULL,
+    supervisor TEXT,
+    dpto INTEGER NOT NULL
+);
 ```
 
 Para verificar tu respuesta, selecciona su definición de la tabla sqlite_schema mediante la siguiente consulta:
@@ -704,7 +745,15 @@ Reescribe la definición de la tabla de `FAMILIAR` para agregar su clave primari
 
 Solución
 ```sql
-
+CREATE TABLE FAMILIAR (
+    empleado TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    sexo TEXT NOT NULL CHECK (sexo IN ('F', 'M', 'O')),
+    fechaNac TEXT NOT NULL,
+    relacion TEXT NOT NULL CHECK (relacion IN ('Hijo/a', 'Conyuge', 'Hermano/a')),
+    PRIMARY KEY (empleado, nombre),
+    FOREIGN KEY (empleado) REFERENCES EMPLEADO(dni)
+);
 ```
 
 Para verificar tu respuesta, selecciona su definición de la tabla sqlite_schema mediante la siguiente consulta:
@@ -858,7 +907,10 @@ Elimina la columna `valoracion` de la tabla `UBICACION`  (anteriormente, `LOCALI
 
 Solución:
 ```sql
-
+ALTER TABLE  LOCALIZACIONES_DPTO ADD valoracion integer not null default 0 check (valoracion > -1 and valoracion <6);
+ALTER TABLE LOCALIZACIONES_DPTO rename to UBICACION;
+ALTER TABLE  unicacion drop column valoracion;
+select name, sql from sqlite_schema where type='table' and name like 'ubi%';
 ```
 
 Para verificar tu respuesta, selecciona su definición de la tabla sqlite_schema mediante la siguiente consulta:
