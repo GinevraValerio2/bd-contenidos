@@ -21,8 +21,13 @@ Escribe una consulta que calcule y devuelva una columna llamada `que_donde` que 
 
 Solución:
 ```sql
-
-
+select 
+    upper(genero) || ' ' || lower(pais) as que_donde,
+    round((cast(me_gusta as real) / reproducciones) * 100, 1) as porcentaje_me_gusta
+from cancion
+where idioma != 'ES'
+order by porcentaje_me_gusta desc
+limit 10;
 ```
 
 Resultado:
@@ -167,7 +172,21 @@ Para emitir una canción en la radio hay que añadirle una cuña publicitaria. E
 
 Solución:
 ```sql
-
+select distinct
+    titulo,
+    pais,
+    duracion,
+    ROUND(
+        (duracion + 
+            case 
+                when pais = 'Reino Unido' THEN 30
+                when pais = 'España' THEN 45
+            end
+        ) / 60.0, 
+    2) as duracion_radio_min
+from cancion
+order by duracion_radio_min desc
+limit 20;
 
 ```
 
@@ -371,7 +390,9 @@ Escribe una consulta para encontrar las canciones (`cancion`) cuya duración (`d
 
 Solución:
 ```sql
-
+select *
+from cancion
+where duracion IS NOT NULL and idioma IS NULL;
 
 ```
 
@@ -471,7 +492,12 @@ Escribe una consulta que devuelva todas las columnas de las canciones y añada u
 
 Solución:
 ```sql
-
+select 
+    *,
+    coalesce(duracion, reproducciones, me_gusta, valoracion, -1) as primer_dato
+from cancion
+order by id_cancion desc
+limit 10;
 
 ```
 
@@ -582,6 +608,10 @@ Escribe una consulta que cuente las canciones que **no** están en inglés, cont
 Solución:
 
 ```sql
+select 
+    count(titulo) as no_ingles
+from cancion
+where idioma != 'EN' OR idioma is NULL;
 ```
 
 Resultado:
@@ -653,7 +683,10 @@ Salida:
 
 Solución:
 ```sql
-
+select 
+    avg(reproducciones) as avg(reproducciones)
+from cancion
+where reproducciones > 1000000;
 
 ```
 
@@ -693,7 +726,9 @@ Salida:
 
 Solución:
 ```sql
-
+select
+    count(distinct anio) as anios_distintos
+from cancion;
 
 ```
 
@@ -763,7 +798,11 @@ Escribe una consulta que muestre cada año de publicación (`anio`) distinto en 
 
 Solución:
 ```sql
-
+select 
+    anio, 
+    count(*) as canciones_mismo_anio
+from cancion
+group by anio;
 
 ```
 
